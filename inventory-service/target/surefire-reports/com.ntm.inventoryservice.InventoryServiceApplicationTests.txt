@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.ntm.inventoryservice.InventoryServiceApplicationTests
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 6.003 s - in com.ntm.inventoryservice.InventoryServiceApplicationTests

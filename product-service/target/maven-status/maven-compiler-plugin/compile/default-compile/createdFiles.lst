@@ -1,0 +1,7 @@
+com\ntm\productservice\dto\ProductResponse.class
+com\ntm\productservice\service\ProductService.class
+com\ntm\productservice\model\Product.class
+com\ntm\productservice\dto\ProductRequest.class
+com\ntm\productservice\repository\ProductRepository.class
+com\ntm\productservice\controller\ProductController.class
+com\ntm\productservice\ProductServiceApplication.class
