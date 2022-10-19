@@ -4,8 +4,9 @@ import com.ntm.orderservice.dto.InventoryResponse;
 import com.ntm.orderservice.dto.OrderLineItemsDto;
 import com.ntm.orderservice.dto.OrderRequest;
 import com.ntm.orderservice.model.Order;
-import com.ntm.orderservice.model.OrderLineItems;
+import com.ntm.orderservice.model.OrderLineItem;
 import com.ntm.orderservice.repository.OrderRepository;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,17 +23,17 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final WebClient.Builder webClientBuilder;
 
-    public void placeOrder(OrderRequest orderRequest){
+    public String placeOrder(OrderRequest orderRequest){
         Order order = new Order();
         order.setOrderNumber(UUID.randomUUID().toString());
-        List<OrderLineItems> orderLineItems = orderRequest.getOrderLineItemsDtoList()
+        List<OrderLineItem> orderLineItems = orderRequest.getOrderLineItemsDtoList()
                 .stream()
                 .map(this::mapToDto).toList();
-        order.setOrderLineItemsList(orderLineItems);
+        order.setOrderLineItemList(orderLineItems);
         //Collect all order Line items skuCodes
-        List<String> skuCodes = order.getOrderLineItemsList()
+        List<String> skuCodes = order.getOrderLineItemList()
                 .stream()
-                .map(OrderLineItems::getSkuCode)
+                .map(OrderLineItem::getSkuCode)
                 .toList();
 
         //Check if item exists in stock before placing the order
@@ -48,17 +49,19 @@ public class OrderService {
 
         if(allProductsInStock){
             orderRepository.save(order);
+            return "Order placed successfully";
         }else{
             throw new IllegalArgumentException("Could not place order. Item is not in stock.");
         }
 
     }
 
-    private OrderLineItems mapToDto(OrderLineItemsDto orderLineItemsDto) {
-        OrderLineItems orderLineItems = new OrderLineItems();
-        orderLineItems.setPrice(orderLineItemsDto.getPrice());
-        orderLineItems.setQuantity(orderLineItemsDto.getQuantity());
-        orderLineItems.setSkuCode(orderLineItemsDto.getSkuCode());
-        return orderLineItems;
+
+    private OrderLineItem mapToDto(OrderLineItemsDto orderLineItemsDto) {
+        OrderLineItem orderLineItem = new OrderLineItem();
+        orderLineItem.setPrice(orderLineItemsDto.getPrice());
+        orderLineItem.setQuantity(orderLineItemsDto.getQuantity());
+        orderLineItem.setSkuCode(orderLineItemsDto.getSkuCode());
+        return orderLineItem;
     }
 }
